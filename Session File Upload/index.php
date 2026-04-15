@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// যদি আগে থেকেই লগইন করা থাকে
+
 if (isset($_SESSION['loggedin'])) {
     header("Location: upload.php");
     exit;
@@ -27,7 +27,7 @@ if (isset($_POST['login'])) {
         $_SESSION['loggedin'] = $user_id;
         header("Location: upload.php");
     } else {
-        $error = "ID বা Password ভুল!";
+        $error = "ID or Password wrong";
     }
 }
 ?>
