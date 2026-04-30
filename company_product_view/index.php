@@ -1,28 +1,28 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "company");
 
-// ডাটাবেস সংযোগ পরীক্ষা
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ব্র্যান্ড ডাটা সেভ করা
+
 if (isset($_POST['submit_brand'])) {
     $name = $_POST['brand_name'];
     $contact = $_POST['brand_contact'];
     $conn->query("INSERT INTO brand (name, contact) VALUES ('$name', '$contact')");
 }
 
-// প্রোডাক্ট ডাটা সেভ করা
+
 if (isset($_POST['submit_product'])) {
     $name = $_POST['p_name'];
     $price = $_POST['p_price'];
     $brand_id = $_POST['p_brand_id'];
 
-    // --- আপডেট করা অংশ শুরু ---
+
     $upload_dir = "uploads/";
 
-    // যদি uploads ফোল্ডারটি না থাকে, তবে তৈরি করো
+
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
@@ -30,14 +30,13 @@ if (isset($_POST['submit_product'])) {
     $image = $_FILES['p_image']['name'];
     $target = $upload_dir . basename($image);
 
-    // ফাইলটি আপলোড করার চেষ্টা
+
     if (move_uploaded_file($_FILES['p_image']['tmp_name'], $target)) {
         $conn->query("INSERT INTO products (Name, Price, Brand_id, Product_image) VALUES ('$name', '$price', '$brand_id', '$image')");
         echo "<script>alert('Product and Image uploaded successfully!');</script>";
     } else {
         echo "Image upload failed!";
     }
-    // --- আপডেট করা অংশ শেষ ---
 }
 
 $brands = $conn->query("SELECT * FROM brand");
