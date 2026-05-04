@@ -70,18 +70,18 @@ $expensive_prods = $conn->query("SELECT * FROM expensive_products"); // View cal
 
     <hr>
 
-    <h2>Delete Manufacturer</h2>
+    <h2>Delete Manufacturer:</h2>
     <form method="GET" onsubmit="return confirm('Are you sure? This will also delete all related products via Trigger.');">
-        <label for="del_mfg_id">Delete Manufacturer :</label>
+        <!-- <label for="del_mfg_id">Delete Manufacturer :</label> -->
         <select name="del_mfg_id" id="del_mfg_id" required>
-            <!-- প্রথম অপশনটি একটি প্রম্পট হিসেবে থাকবে -->
+            <!-- The first option will be a prompt -->
             <option value="">--- Select Manufacturer ---</option>
 
             <?php
-            // ডাটাবেস থেকে লিস্ট আনা হচ্ছে
+            // Fetching list from database
             $m_list = $conn->query("SELECT * FROM Manufacturer");
 
-            // লুপের মাধ্যমে ডাটা দেখানো হচ্ছে
+            // Looping through the results to display options
             if ($m_list->num_rows > 0) {
                 while ($m = $m_list->fetch_assoc()) {
                     echo "<option value='" . $m['id'] . "'>" . $m['id'] . " - " . $m['name'] . "</option>";
@@ -93,28 +93,43 @@ $expensive_prods = $conn->query("SELECT * FROM expensive_products"); // View cal
         </select>
 
         <button type="submit" style="color: red; cursor: pointer; font-weight: bold;">
-            Delete Selected
+            Delete
         </button>
     </form>
 
 
     <hr>
+    <hr>
 
-    <h2>Expensive Products (From VIEW - Price > 5000)</h2>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Product Name</th>
-            <th>Price</th>
-        </tr>
-        <?php while ($vp = $expensive_prods->fetch_assoc()): ?>
+<h2>Expensive Products (From VIEW - Price > 5000)</h2>
+<table border="1" cellpadding="10" cellspacing="0">
+    <tr bgcolor="#eee">
+        <th>ID</th>
+        <th>Product Name</th>
+        <th>Manufacturer</th> <!-- নতুন হেড কলাম -->
+        <th>Price</th>
+    </tr>
+
+    <?php 
+    // ভিউ থেকে আপডেট করা ডাটা পুনরায় কুয়েরি করা হচ্ছে
+    $expensive_prods = $conn->query("SELECT * FROM expensive_prods");
+
+    if ($expensive_prods && $expensive_prods->num_rows > 0):
+        while ($vp = $expensive_prods->fetch_assoc()): 
+    ?>
             <tr>
                 <td><?= $vp['id'] ?></td>
                 <td><?= $vp['name'] ?></td>
+                <td><?= $vp['manufacturer_name'] ?></td> <!-- ভিউ থেকে আসা কোম্পানির নাম -->
                 <td><?= $vp['price'] ?></td>
             </tr>
         <?php endwhile; ?>
-    </table>
+    <?php else: ?>
+        <tr>
+            <td colspan="4" style="text-align:center;">No expensive products found.</td>
+        </tr>
+    <?php endif; ?>
+</table>
 
 </body>
 
