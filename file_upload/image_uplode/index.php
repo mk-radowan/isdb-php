@@ -11,13 +11,13 @@
 
     <?php
     if (isset($_POST['submitbtn'])) {
-        $fileName = $_FILES['filen']['name'];
-        $tmp      = $_FILES['filen']['tmp_name'];
+        $fileName = $_FILES['filen']['name'];   
+        $tmp      = $_FILES['filen']['tmp_name'];   
         $fileSize = $_FILES['filen']['size'];
-        $type     = pathinfo($fileName, PATHINFO_EXTENSION);
+        $type     = pathinfo($fileName, PATHINFO_EXTENSION);   
 
-        $folder   = "img/" . $fileName;
-        $maxSize  = 400 * 1024;
+        $folder   = "img/" . $fileName; 
+        $maxSize  = 400 * 1024;  
 
 
         if (($type == "jpg" || $type == "png" || $type == "jpeg") && ($fileSize <= $maxSize)) {
