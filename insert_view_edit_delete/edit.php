@@ -2,7 +2,6 @@
 $conn = new mysqli("localhost", "root", "", "company");
 $id = $_GET['id'];
 
-// আপডেট করার লজিক
 if (isset($_POST['update'])) {
     $name = $_POST['p_name'];
     $price = $_POST['p_price'];

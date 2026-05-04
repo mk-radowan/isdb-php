@@ -1,7 +1,7 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "company");
 
-// ডিলিট লজিক
+
 if (isset($_GET['del_id'])) {
     $id = $_GET['del_id'];
     $conn->query("DELETE FROM products WHERE id=$id");
@@ -42,7 +42,7 @@ $result = $conn->query($sql);
                 <td>
                     <a href="single_view.php?id=<?= $row['id'] ?>">View</a> |
                     <a href="edit.php?id=<?= $row['id'] ?>">Edit</a> |
-                    <a href="view.php?del_id=<?= $row['id'] ?>" onclick="return confirm('নিশ্চিত ডিলিট করবেন?')">Delete</a>
+                    <a href="view.php?del_id=<?= $row['id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
         <?php endwhile; ?>
