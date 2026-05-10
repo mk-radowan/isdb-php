@@ -33,7 +33,7 @@ if (isset($_GET['del_mfg_id'])) {
 }
 
 $manufacturers = $conn->query("SELECT * FROM Manufacturer");
-$expensive_prods = $conn->query("SELECT * FROM expensive_products"); // View call
+$expensive_prods = $conn->query("SELECT * FROM expensive_prods"); // View call
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +43,7 @@ $expensive_prods = $conn->query("SELECT * FROM expensive_products"); // View cal
     <title>Management System</title>
 </head>
 
-<body>
+<body style="margin-left: 30px;">
 
     <h2>Add Manufacturer</h2>
     <form method="POST">
@@ -101,35 +101,35 @@ $expensive_prods = $conn->query("SELECT * FROM expensive_products"); // View cal
     <hr>
     <hr>
 
-<h2>Expensive Products (From VIEW - Price > 5000)</h2>
-<table border="1" cellpadding="10" cellspacing="0">
-    <tr bgcolor="#eee">
-        <th>ID</th>
-        <th>Product Name</th>
-        <th>Manufacturer</th> <!-- নতুন হেড কলাম -->
-        <th>Price</th>
-    </tr>
-
-    <?php 
-    // ভিউ থেকে আপডেট করা ডাটা পুনরায় কুয়েরি করা হচ্ছে
-    $expensive_prods = $conn->query("SELECT * FROM expensive_prods");
-
-    if ($expensive_prods && $expensive_prods->num_rows > 0):
-        while ($vp = $expensive_prods->fetch_assoc()): 
-    ?>
-            <tr>
-                <td><?= $vp['id'] ?></td>
-                <td><?= $vp['name'] ?></td>
-                <td><?= $vp['manufacturer_name'] ?></td> <!-- ভিউ থেকে আসা কোম্পানির নাম -->
-                <td><?= $vp['price'] ?></td>
-            </tr>
-        <?php endwhile; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="4" style="text-align:center;">No expensive products found.</td>
+    <h2>Expensive Products (From VIEW - Price > 5000)</h2>
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr bgcolor="#eee">
+            <th>ID</th>
+            <th>Product Name</th>
+            <th>Manufacturer</th>
+            <th>Price</th>
         </tr>
-    <?php endif; ?>
-</table>
+
+        <?php
+        // Requerying updated data from the view
+        $expensive_prods = $conn->query("SELECT * FROM expensive_prods");
+
+        if ($expensive_prods && $expensive_prods->num_rows > 0):
+            while ($vp = $expensive_prods->fetch_assoc()):
+        ?>
+                <tr>
+                    <td><?= $vp['id'] ?></td>
+                    <td><?= $vp['name'] ?></td>
+                    <td><?= $vp['manufacturer_name'] ?></td>
+                    <td><?= $vp['price'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="4" style="text-align:center;">No expensive products found.</td>
+            </tr>
+        <?php endif; ?>
+    </table>
 
 </body>
 

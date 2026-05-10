@@ -1,0 +1,131 @@
+-- ১. ব্যবহারকারী টেবিল (Core User Authentication)
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    phone_number VARCHAR(15) NOT NULL UNIQUE, -- বাংলাদেশে OTP লগইনের জন্য ইউনিক মোবাইল নম্বর
+    email VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('customer', 'driver', 'admin', 'staff') DEFAULT 'customer',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ২. ব্যবহারকারী প্রোফাইল (Personal Details)
+CREATE TABLE user_profiles (
+    profile_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    present_address TEXT,
+    permanent_address TEXT,
+    profile_picture VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ৩. এনআইডি/পরিচয় যাচাই (Identity Verification)
+CREATE TABLE identity_verification (
+    verification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    id_type ENUM('NID', 'Passport', 'Birth Certificate') DEFAULT 'NID',
+    id_number VARCHAR(50) NOT NULL UNIQUE,
+    id_front_image VARCHAR(255),
+    id_back_image VARCHAR(255),
+    verification_status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
+    verified_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ৪. বিভাগ টেবিল (Geographical Context)
+CREATE TABLE divisions (
+    division_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE, -- ঢাকা, চট্টগ্রাম, ইত্যাদি
+    active_service BOOLEAN DEFAULT TRUE
+) ENGINE=InnoDB;
+
+-- ৫. গাড়ি টেবিল (Vehicle Inventory)
+CREATE TABLE vehicles (
+    vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
+    registration_number VARCHAR(50) NOT NULL UNIQUE, -- যেমন: ঢাকা মেট্রো-গ ১১-XXXX
+    brand VARCHAR(50), -- Toyota, Honda
+    model VARCHAR(50), -- Axio, Noah
+    vehicle_type ENUM('Sedan', 'SUV', 'Microbus', 'Ambulance') DEFAULT 'Sedan',
+    fuel_type ENUM('CNG', 'LPG', 'Octane', 'Diesel', 'Hybrid'),
+    seat_capacity INT DEFAULT 4,
+    rent_per_day DECIMAL(10, 2) NOT NULL,
+    status ENUM('available', 'booked', 'maintenance') DEFAULT 'available',
+    division_id INT,
+    FOREIGN KEY (division_id) REFERENCES divisions(division_id)
+) ENGINE=InnoDB;
+
+-- ৬. গাড়ির নথিপত্র (BRTA Documents)
+CREATE TABLE vehicle_documents (
+    doc_id INT AUTO_INCREMENT PRIMARY KEY,
+    vehicle_id INT NOT NULL,
+    fitness_certificate_url VARCHAR(255),
+    tax_token_url VARCHAR(255),
+    insurance_copy_url VARCHAR(255),
+    expiry_date DATE, -- ফিটনেস বা ট্যাক্সের মেয়াদ শেষ হওয়ার তারিখ
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ৭. চালক টেবিল (Driver Profiles)
+CREATE TABLE drivers (
+    driver_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    license_number VARCHAR(50) NOT NULL UNIQUE,
+    license_expiry_date DATE,
+    experience_years INT,
+    rating DECIMAL(3, 2) DEFAULT 0.0,
+    availability_status BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ৮. বুকিং টেবিল (Main Transactions)
+CREATE TABLE bookings (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    vehicle_id INT NOT NULL,
+    driver_id INT, -- যদি Self-drive হয় তবে Null থাকতে পারে
+    pickup_location TEXT NOT NULL,
+    dropoff_location TEXT NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    total_fare DECIMAL(10, 2),
+    booking_status ENUM('pending', 'confirmed', 'ongoing', 'completed', 'cancelled') DEFAULT 'pending',
+    FOREIGN KEY (customer_id) REFERENCES users(user_id),
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id),
+    FOREIGN KEY (driver_id) REFERENCES drivers(driver_id)
+) ENGINE=InnoDB;
+
+-- ৯. পেমেন্ট টেবিল (Financial Records)
+CREATE TABLE payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method ENUM('bKash', 'Nagad', 'Card', 'Cash') NOT NULL,
+    transaction_id VARCHAR(100) UNIQUE, -- MFS TrxID
+    payment_status ENUM('pending', 'paid', 'refunded') DEFAULT 'pending',
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+) ENGINE=InnoDB;
+
+-- ১০. রক্ষণাবেক্ষণ লগ (Vehicle Maintenance)
+CREATE TABLE maintenance_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    vehicle_id INT NOT NULL,
+    maintenance_date DATE NOT NULL,
+    description TEXT, -- যেমন: অয়েল চেঞ্জ বা টায়ার পরিবর্তন
+    cost DECIMAL(10, 2),
+    next_service_date DATE,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ১১. রিভিউ ও রেটিং (Feedback)
+CREATE TABLE reviews (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    customer_id INT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id),
+    FOREIGN KEY (customer_id) REFERENCES users(user_id)
+) ENGINE=InnoDB;
