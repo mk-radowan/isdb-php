@@ -49,7 +49,8 @@ class AuthController {
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user && password_verify($password, $user['password_hash'])) {
+            // CHANGED: plain text password comparison (no hashing)
+            if ($user && $password === $user['password_hash']) {
 
                 // Check active status
                 if (!$user['is_active']) {
@@ -148,8 +149,8 @@ class AuthController {
                 // Begin transaction
                 $db->beginTransaction();
 
-                // FIXED: PASSWORD_BCRYPT স্পেলিং ঠিক করা হয়েছে
-                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                // CHANGED: storing plain text password (no hashing)
+                $insert_password = $password;
 
                 // Insert user
                 $userQuery = "INSERT INTO users 
@@ -161,7 +162,7 @@ class AuthController {
 
                 $userStmt->bindParam(':phone', $phoneNumber);
                 $userStmt->bindParam(':email', $email);
-                $userStmt->bindParam(':password', $hashedPassword);
+                $userStmt->bindParam(':password', $insert_password);
 
                 $userStmt->execute();
 
@@ -251,5 +252,5 @@ class AuthController {
 
         exit();
     }
-} 
+}
 ?>

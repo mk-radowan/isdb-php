@@ -1,50 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | AutoRide</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
+<?php require_once __DIR__ . '/includes/header.php'; ?>
 
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <div class="text-center mb-6">
-            <h2 class="text-3xl font-bold text-blue-600">AutoRide</h2>
-            <p class="text-gray-500 mt-2">আপনার অ্যাকাউন্টে লগইন করুন</p>
-        </div>
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mt-5">
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="text-center fw-bold mb-4">Welcome Back!</h3>
+                    
+                    <!-- Error Message Display -->
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger text-center">
+                            <?= htmlspecialchars($error) ?>
+                        </div>
+                    <?php endif; ?>
 
-        <?php if (isset($error) && !empty($error)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-                <?php echo htmlspecialchars($error); ?>
+                    <form action="?url=login/process" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number or Email</label>
+                            <input type="text" class="form-control" name="identity" placeholder="Enter phone or email" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Login</button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Don't have an account? <a href="?url=register" class="text-decoration-none fw-bold">Sign up here</a></p>
+                    </div>
+                </div>
             </div>
-        <?php endif; ?>
-
-        <form action="index.php?url=login/process" method="POST" id="loginForm">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">ফোন নম্বর অথবা ইমেইল</label>
-                <input type="text" name="identity" required 
-                       placeholder="01XXXXXXXXX অথবা email@domain.com"
-                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">পাসওয়ার্ড</label>
-                <input type="password" name="password" required 
-                       placeholder="••••••••"
-                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <button type="submit" 
-                    class="w-full bg-blue-600 text-white font-bold p-3 rounded hover:bg-blue-700 transition duration-300">
-                লগইন করুন
-            </button>
-        </form>
-
-        <div class="text-center mt-4">
-            <p class="text-sm text-gray-600">নতুন ইউজার? <a href="index.php?url=register" class="text-blue-500 hover:underline">রেজিস্ট্রেশন করুন</a></p>
         </div>
     </div>
+</section>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
